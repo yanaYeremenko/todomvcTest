@@ -3,17 +3,18 @@ package ua.net.itlabs.yana.hw4;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import ua.net.itlabs.yana.Todos.page.PageObject;
+import ua.net.itlabs.yana.Todos.page.TodoMVCPage;
+
 import static com.codeborne.selenide.CollectionCondition.texts;
 import static com.codeborne.selenide.CollectionCondition.empty;
 import static com.codeborne.selenide.Condition.*;
 import static com.codeborne.selenide.Selenide.*;
 
 public class TodosTest {
-    PageObject pageObject;
+    TodoMVCPage page;
 
     public TodosTest() {
-        pageObject = new PageObject();
+        page = new TodoMVCPage();
     }
 
     @BeforeClass
@@ -32,115 +33,116 @@ public class TodosTest {
     public void testAllFilters() {
 
         // create tasks
-        pageObject.addTask("A");
-        pageObject.addTask("B");
-        pageObject.addTask("C");
-        pageObject.addTask("D");
-        pageObject.addTask("E");
-        pageObject.todos.shouldHave(texts("A", "B", "C", "D", "E"));
-        pageObject.assertItemsLeftCounter(5);
+        page.addTask("A");
+        page.addTask("B");
+        page.addTask("C");
+        page.addTask("D");
+        page.addTask("E");
+        page.todos.shouldHave(texts("A", "B", "C", "D", "E"));
+        page.assertItemsLeftCounter(5);
 
         // delete active task
-        pageObject.deleteTask("C");
-        pageObject.todos.shouldHave(texts("A", "B", "D", "E"));
-        pageObject.assertItemsLeftCounter(4);
+        page.deleteTask("C");
+        page.todos.shouldHave(texts("A", "B", "D", "E"));
+        page.assertItemsLeftCounter(4);
 
         // edit task
-        pageObject.edit("A", "A edited");
-        pageObject.todos.shouldHave(texts("A edited", "B", "D", "E"));
+        page.edit("A", "A edited");
+        page.todos.shouldHave(texts("A edited", "B", "D", "E"));
 
         // mark active task as completed
-        pageObject.toggle("A edited");
-        pageObject.toggle("B");
-        pageObject.todos.filter(cssClass("completed")).shouldHave(texts("A edited", "B"));
-        pageObject.assertItemsLeftCounter(2);
+        page.toggle("A edited");
+        page.toggle("B");
+        page.todos.filter(cssClass("completed")).shouldHave(texts("A edited", "B"));
+        page.assertItemsLeftCounter(2);
+        page.assertItemsCompletedCounter(2);
 
         // reopen task
-        pageObject.toggle("B");
-        pageObject.assertItemsLeftCounter(3);
+        page.toggle("B");
+        page.assertItemsLeftCounter(3);
 
         //clear completed task
-        pageObject.clearCompleted();
-        pageObject.todos.shouldHave(texts("B", "D", "E"));
+        page.clearCompleted();
+        page.todos.shouldHave(texts("B", "D", "E"));
 
         // complete all task & clear
-        pageObject.toggleAll();
-        pageObject.assertItemsLeftCounter(0);
-        pageObject.clearCompleted();
-        pageObject.todos.shouldBe(empty);
+        page.toggleAll();
+        page.assertItemsLeftCounter(0);
+        page.clearCompleted();
+        page.todos.shouldBe(empty);
     }
 
     @Test
     public void testActiveFilters() {
 
         // precondition
-        pageObject.addTask("A");
-        pageObject.addTask("B");
-        pageObject.addTask("C");
-        pageObject.todos.shouldHave(texts("A", "B", "C"));
-        pageObject.assertItemsLeftCounter(3);
+        page.addTask("A");
+        page.addTask("B");
+        page.addTask("C");
+        page.todos.shouldHave(texts("A", "B", "C"));
+        page.assertItemsLeftCounter(3);
 
-        pageObject.toggle("C");
+        page.toggle("C");
 
         // Filter active
-        pageObject.filterActive();
-        pageObject.todos.filter(visible).shouldHave(texts("A", "B"));
+        page.filterActive();
+        page.todos.filter(visible).shouldHave(texts("A", "B"));
 
         //create task
-        pageObject.addTask("D");
-        pageObject.todos.filter(visible).shouldHave(texts("A", "B", "D"));
-        pageObject.assertItemsLeftCounter(3);
+        page.addTask("D");
+        page.todos.filter(visible).shouldHave(texts("A", "B", "D"));
+        page.assertItemsLeftCounter(3);
 
         //filters
-        pageObject.filterAll();
-        pageObject.todos.filter(visible).shouldHave(texts("A", "B", "C", "D"));
-        pageObject.filterActive();
+        page.filterAll();
+        page.todos.filter(visible).shouldHave(texts("A", "B", "C", "D"));
+        page.filterActive();
 
         //edit task
-        pageObject.edit("B", "B edited");
-        pageObject.todos.filter(visible).shouldHave(texts("A", "B edited", "D"));
+        page.edit("B", "B edited");
+        page.todos.filter(visible).shouldHave(texts("A", "B edited", "D"));
 
         //delete task
-        pageObject.deleteTask("A");
-        pageObject.todos.filter(visible).shouldHave(texts("B edited", "D"));
+        page.deleteTask("A");
+        page.todos.filter(visible).shouldHave(texts("B edited", "D"));
 
-        pageObject.toggle("B edited");
-        pageObject.todos.filter(visible).shouldHave(texts("D"));
+        page.toggle("B edited");
+        page.todos.filter(visible).shouldHave(texts("D"));
     }
 
     @Test
     public void testCompletedFilters() {
 
         // precondition
-        pageObject.addTask("A");
-        pageObject.addTask("B");
-        pageObject.addTask("C");
-        pageObject.addTask("D");
-        pageObject.todos.shouldHave(texts("A", "B", "C", "D"));
+        page.addTask("A");
+        page.addTask("B");
+        page.addTask("C");
+        page.addTask("D");
+        page.todos.shouldHave(texts("A", "B", "C", "D"));
 
-        pageObject.toggle("C");
-        pageObject.toggle("A");
-        pageObject.toggle("D");
+        page.toggle("C");
+        page.toggle("A");
+        page.toggle("D");
 
         // Filter completed
-        pageObject.filterCompleted();
-        pageObject.todos.filter(visible).shouldHave(texts("A", "C", "D"));
+        page.filterCompleted();
+        page.todos.filter(visible).shouldHave(texts("A", "C", "D"));
 
         //delete task
-        pageObject.deleteTask("C");
-        pageObject.todos.filter(visible).shouldHave(texts("A", "D"));
+        page.deleteTask("C");
+        page.todos.filter(visible).shouldHave(texts("A", "D"));
 
         //reopen task
-        pageObject.toggle("A");
-        pageObject.todos.filter(visible).shouldHave(texts("D"));
+        page.toggle("A");
+        page.todos.filter(visible).shouldHave(texts("D"));
 
         // clear
-        pageObject.clearCompleted();
-        pageObject.todos.filter(visible).shouldBe(empty);
+        page.clearCompleted();
+        page.todos.filter(visible).shouldBe(empty);
 
         // filters
-        pageObject.filterActive();
-        pageObject.todos.filter(visible).shouldHave(texts("A", "B"));
-        pageObject.assertItemsLeftCounter(2);
+        page.filterActive();
+        page.todos.filter(visible).shouldHave(texts("A", "B"));
+        page.assertItemsLeftCounter(2);
     }
 }

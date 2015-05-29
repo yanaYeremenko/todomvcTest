@@ -3,7 +3,7 @@ package ua.net.itlabs.yana.hw3;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import static ua.net.itlabs.yana.Todos.page.PageStatic.*;
+import static ua.net.itlabs.yana.Todos.page.TodoMVC.*;
 import static com.codeborne.selenide.CollectionCondition.texts;
 import static com.codeborne.selenide.CollectionCondition.empty;
 import static com.codeborne.selenide.Condition.*;
@@ -49,6 +49,7 @@ public class TodosTest {
             toggle("B");
             todos.filter(cssClass("completed")).shouldHave(texts("A edited", "B"));
             assertItemsLeftCounter(2);
+            assertItemsCompletedCounter(2);
 
             // reopen task
             toggle("B");
@@ -76,6 +77,7 @@ public class TodosTest {
         assertItemsLeftCounter(3);
 
         toggle("C");
+        assertItemsCompletedCounter(1);
 
         // Filter active
         filterActive();
@@ -88,7 +90,7 @@ public class TodosTest {
 
         //filters
         filterAll();
-        todos.filter(visible).shouldHave(texts("A","B","C","D"));
+        todos.filter(visible).shouldHave(texts("A", "B", "C", "D"));
         filterActive();
 
         //edit task
@@ -98,9 +100,13 @@ public class TodosTest {
         //delete task
         deleteTask("A");
         todos.filter(visible).shouldHave(texts("B edited", "D"));
+        filterAll();
+        todos.filter(visible).shouldHave(texts("B edited", "C", "D"));
+        filterActive();
 
         toggle("B edited");
         todos.filter(visible).shouldHave(texts("D"));
+        assertItemsLeftCounter(1);
     }
 
     @Test
@@ -120,14 +126,20 @@ public class TodosTest {
         // Filter completed
         filterCompleted();
         todos.filter(visible).shouldHave(texts("A", "C", "D"));
+        assertItemsCompletedCounter(3);
 
         //delete task
         deleteTask("C");
         todos.filter(visible).shouldHave(texts("A", "D"));
+        assertItemsCompletedCounter(2);
+        filterAll();
+        todos.filter(visible).shouldHave(texts("A", "B", "D"));
+        filterCompleted();
 
         //reopen task
         toggle("A");
         todos.filter(visible).shouldHave(texts("D"));
+        assertItemsCompletedCounter(1);
 
         // clear
         clearCompleted();
@@ -135,7 +147,9 @@ public class TodosTest {
 
        // filters
         filterActive();
-        todos.filter(visible).shouldHave(texts("A","B"));
+        todos.filter(visible).shouldHave(texts("A", "B"));
+        filterAll();
+        todos.filter(visible).shouldHave(texts("A", "B"));
         assertItemsLeftCounter(2);
     }
 }

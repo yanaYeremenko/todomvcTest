@@ -1,7 +1,6 @@
 package ua.net.itlabs.yana.Todos.page;
 
 import com.codeborne.selenide.ElementsCollection;
-import org.openqa.selenium.WebElement;
 import ru.yandex.qatools.allure.annotations.Step;
 
 import static com.codeborne.selenide.Condition.exactText;
@@ -9,9 +8,8 @@ import static com.codeborne.selenide.Condition.hidden;
 import static com.codeborne.selenide.Condition.text;
 import static com.codeborne.selenide.Selenide.$;
 import static com.codeborne.selenide.Selenide.$$;
-import static com.codeborne.selenide.Selenide.actions;
 
-public class PageObject {
+public class TodoMVCPage {
     public ElementsCollection todos = $$("#todo-list>li");
 
     @Step
@@ -30,13 +28,8 @@ public class PageObject {
     }
 
     @Step
-    public void doubleClick(WebElement webElement) {
-        actions().moveToElement(webElement).doubleClick().perform();
-    }
-
-    @Step
     public void edit(String nameTask, String newName) {
-        doubleClick(todos.find(text(nameTask)).find("label"));
+        todos.find(text(nameTask)).find("label").doubleClick();
         $(".editing").find(".edit").setValue(newName).pressEnter();
     }
 
@@ -48,7 +41,7 @@ public class PageObject {
     @Step
     public void clearCompleted() {
         $("#clear-completed").click();
-        $("#clearCompleted").shouldBe(hidden);
+        $("#clear-completed").shouldBe(hidden);
     }
 
     @Step
@@ -68,5 +61,10 @@ public class PageObject {
     @Step
     public void assertItemsLeftCounter(Integer qty){
         $("#todo-count strong").shouldHave(text(qty.toString()));
+    }
+
+    @Step
+    public void assertItemsCompletedCounter(Integer quantity) {
+        $("#clear-completed").shouldHave(text(quantity.toString()));
     }
 }
